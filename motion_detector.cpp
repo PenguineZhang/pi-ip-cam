@@ -34,16 +34,14 @@ std::tuple<cv::Mat, int, int, int, int> SingleMotionDetector::detect(cv::Mat& im
 
     int erosion_size = 0;
     int dilation_size = 0;
-    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(1, 1), cv::Point(0, 0));
-    cv::erode(thresh_img, thresh_img, element);
-    cv::erode(thresh_img, thresh_img, element);
-    cv::dilate(thresh_img, thresh_img, element);
-    cv::dilate(thresh_img, thresh_img, element);
+    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(0, 0));
+    cv::erode(thresh_img, thresh_img, element, cv::Point(-1, -1), 2);
+    cv::dilate(thresh_img, thresh_img, element, cv::Point(-1, -1), 2);
 
     std::vector<std::vector<cv::Point>> cnts;
     cv::findContours(thresh_img, cnts, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
     if(cnts.size() == 0){
-        std::cout << "no contour is found, return nothing\n";
+        //std::cout << "no contour is found, return nothing\n";
         return std::tuple<cv::Mat, int, int, int, int>();
     }
 

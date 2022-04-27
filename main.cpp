@@ -6,7 +6,6 @@
 #include <thread>
 
 #include "motion_detector.hpp"
-#include "opencv2/imgcodecs.hpp"
 
 using MJPEGStreamer = nadjieb::MJPEGStreamer;
 
@@ -20,7 +19,7 @@ int main(int argc, char** argv)
     cv::VideoCapture vcap(0);
 
     int frame_count = 32;
-	
+
     if(!vcap.open(0)){
         std::cout << "Error opening video stream." << std::endl;
         return -1;
@@ -31,7 +30,7 @@ int main(int argc, char** argv)
 
     SingleMotionDetector md(0.1);
     int total = 0;
-	
+
     while (streamer.isRunning()){
 		cv::Mat frame;
         vcap >> frame;
@@ -47,9 +46,9 @@ int main(int argc, char** argv)
 
 		if( total > frame_count){
 			auto [thresh_img, minX, minY, maxX, maxY] = md.detect(gray_img);
-			
+
 			if(!thresh_img.empty()){
-				std::cout << "detected contours: " << minX << " " << minY << " " << maxX << " " << maxY << "\n";
+				//std::cout << "detected contours: " << minX << " " << minY << " " << maxX << " " << maxY << "\n";
 				cv::rectangle(frame, cv::Rect(cv::Point2i(minX, minY), cv::Point2i(maxX, maxY)), cv::Scalar(0, 0, 255), 2);
 			}
 		}
@@ -58,14 +57,14 @@ int main(int argc, char** argv)
 		total++;
 
         std::vector<uchar> buff_bgr;
-        
+
 		cv::imencode(".jpg", frame, buff_bgr, params);
 
 
         streamer.publish("/bgr", std::string(buff_bgr.begin(), buff_bgr.end()));
 
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		
+
     }
 
     streamer.stop();
